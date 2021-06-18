@@ -1,85 +1,88 @@
-import { HttpException, HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import { ERole } from "../shared/enums/role.enum";
-import { MailerModule } from '@nestjs-modules/mailer';
+import { EmailService } from 'src/email/email.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
 
-    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
+    constructor(@InjectModel(User.name) private userModel: Model<UserDocument>, private emailService: EmailService, private jwtService: JwtService) { }
 
-    async createUser(createUserDto: any): Promise<User> {
+    async createUserManager(createUserDto: any): Promise<User> {
 
-        // const createdUser = new this.userModel(createUserDto);
-        // return createdUser.save();
-        //----------------------------------------------------------
-        if (createUserDto.role === ERole.Manager) {
-
+        let userManager = await this.userModel.findOne({ email: createUserDto.email });
+        if (!userManager) {
+            userManager = await this.userModel.create({
+                ...createUserDto,
+            });
         }
 
+        const code = (Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString();
 
+        const { verificationCode } = await this.userModel.findByIdAndUpdate(
+            userManager._id,
+            { verificationCode: code },
+            { new: true, useFindAndModify: false },
+        );
 
-        const isExistіn = await this.userModel.findOne(createUserDto.email);
-        if (isExistіn) {
-            throw new NotAcceptableException("email is existіn")
-            //throw new HttpException("email is existіn", HttpStatus.NOT_ACCEPTABLE); // Analog
-        }
+        this.emailService.sendUserConfirmation(userManager.email, verificationCode)
 
-        // const hashPassword = await bcrypt.hash(req.body.password, 5);
-
-        // const user = await ModelUsers.create({
-        //   ...req.body,
-        //   password: hashPassword,
-        //   avatarURL: process.env.URL + "/images/" + req.file.filename,
-        // });
-
-        // Controllers.createAndSendVerifyToken(user._id, req.body.email);
-
-        //----------------------------------------------------------
-
-
-        //---------------------------------------------------------
-
-        const createdUser = this.userModel.create(createUserDto);
-        return createdUser;
+        return userManager;
 
     }
 
-    // createAndSendVerifyToken = async (managerId, managerEmail) => {
-    //     // const token = uuid.v4();
-    //     const code = (Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString();
+    async verifycationManager(param) {
+        try {
+            const { verificationCode } = param;
+            const mangerForVerification = await this.userModel.findOneAndUpdate(
+                { verificationCode },
+                {
+                    verificationCode: verificationCode,
+                },
+                { new: true, useFindAndModify: false },
+            );
 
-    //     const { verificationCode } = await this.userModel.findByIdAndUpdate(
-    //         managerId,
-    //         {
-    //             verificationCode: code,
-    //         },
-    //         { new: true, useFindAndModify: false },
-    //     );
+            console.log(verificationCode);
+            console.log(mangerForVerification);
 
-    //     const transporter = nodemailer.createTransport({
-    //         // service: "gmail",
-    //         host: "smtp.gmail.com",
-    //         port: 587,
-    //         secure: false, // true for 587, false for other ports
-    //         // requireTLS: true,
-    //         auth: {
-    //             user: process.env.NODEMAILER_USER,
-    //             pass: process.env.NODEMAILER_PASSWORD,
-    //         },
-    //     });
+            if (!mangerForVerification) {
+                throw new BadRequestException("No mangerForVerification")
+            }
 
-    //     const mailOptions = {
-    //         from: process.env.NODEMAILER_USER,
-    //         to: managerEmail,
-    //         subject: "Email Verification For Bravo",
-    //         html: `<h2>Verification Code: ${verificationCode}</h2>`,
-    //     };
+            console.log(process.env.TOKEN_SECRET)
 
-    //     return transporter.sendMail(mailOptions);
+            // access_token: this.jwtService.sign(payload)
+            console.log("-----")
+            const accessToken = this.jwtService.sign(
+                { mid: mangerForVerification._id, secret: process.env.TOKEN_SECRET ? process.env.TOKEN_SECRET : "qwerty", },
+                // { expiresIn: "30d" },
+            );
 
+            console.log(accessToken)
+            console.log(mangerForVerification.email)
+
+            return {
+                email: mangerForVerification.email,
+                token: accessToken,
+            };
+
+            // return res.status(200).redirect('http://localhost:3001/managers/test')
+
+        } catch (err) {
+            throw new BadRequestException("Error")
+        }
+    };
+
+
+
+
+    // if (isExistіn) {
+    //     throw new NotAcceptableException("email is existіn")
+    //     //throw new HttpException("email is existіn", HttpStatus.NOT_ACCEPTABLE); // Analog
     // }
+
 
 }

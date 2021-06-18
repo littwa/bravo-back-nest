@@ -4,12 +4,13 @@
 // export class UsersController {}
 
 
-import { Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Next, Param, Patch, Post, Put, Redirect, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Next, Param, Patch, Post, Put, Redirect, Req, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Request, Response, } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { Model } from 'mongoose';
+import { ERole } from 'src/shared/enums/role.enum';
 
 @Controller('users')
 export class UsersController {
@@ -19,7 +20,32 @@ export class UsersController {
     @Post()
     @HttpCode(HttpStatus.CREATED)
     postSignUpUser(@Body() body): any {
-        return this.userService.createUser(body)
+        switch (body.role) {
+            case ERole.Manager:
+                return this.userService.createUserManager(body)
+            case ERole.Customer:
+                return this.userService.createUserManager(body)
+            case ERole.Admin:
+                return this.userService.createUserManager(body)
+            default:
+                return new BadRequestException("unknown role")
+        }
+    }
+
+    @Get("manager/:verificationCode")
+    @HttpCode(HttpStatus.OK)
+    getVerifycationUser(@Param() param): any {
+        return this.userService.verifycationManager(param)
+        // switch (body.role) {
+        //     case ERole.Manager:
+        //         return this.userService.verifycationManager(param)
+        //     case ERole.Customer:
+        //         return this.userService.verifycationManager(param)
+        //     case ERole.Admin:
+        //         return this.userService.verifycationManager(param)
+        //     default:
+        //         return new BadRequestException("unknown role")
+        // }
     }
 
     @Get()

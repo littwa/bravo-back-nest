@@ -17,7 +17,7 @@ export class User {
     @Prop({ type: String, required: false, default: "25" })
     age: string;
 
-    @Prop({ type: String, required: true, default: "manager" })
+    @Prop({ type: String, required: true, enum: ["manager", "customer", "admin"] })
     role: string;
 
     @Prop({ type: String, required: true, default: "123456" })

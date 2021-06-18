@@ -1,1 +1,18 @@
-export const MONGO_URL = 'mongodb+srv://adminik:7891ly1987@cluster-mongodb.mqnmf.mongodb.net/db-bravo-nest?retryWrites=true&w=majority';
+export default () => ({
+    nodemailerTransporterConfig: {
+        transport: {
+            host: 'smtp.gmail.com',
+            secure: false,
+            auth: {
+                user: process.env.NODEMAILER_USER,
+                pass: process.env.NODEMAILER_PASSWORD,
+            },
+        },
+        defaults: {
+            from: '"No Reply" <noreply@example.com>',
+        },
+    }
+});
+
+
+
