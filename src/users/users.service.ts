@@ -5,15 +5,17 @@ import { User, UserDocument } from './user.schema';
 import { ERole } from "../shared/enums/role.enum";
 import { EmailService } from 'src/email/email.service';
 import { JwtService } from '@nestjs/jwt';
+import { createUserDto } from './dto/creta-user.dto'
 
 @Injectable()
 export class UsersService {
 
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>, private emailService: EmailService, private jwtService: JwtService) { }
 
-    async createUserManager(createUserDto: any): Promise<User> {
+    async createUserManager(createUserDto: createUserDto): Promise<User> {
 
         let userManager = await this.userModel.findOne({ email: createUserDto.email });
+
         if (!userManager) {
             userManager = await this.userModel.create({
                 ...createUserDto,
@@ -22,15 +24,15 @@ export class UsersService {
 
         const code = (Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString();
 
-        const { verificationCode } = await this.userModel.findByIdAndUpdate(
+        const updatedUserManager = await this.userModel.findByIdAndUpdate(
             userManager._id,
             { verificationCode: code },
             { new: true, useFindAndModify: false },
         );
 
-        this.emailService.sendUserConfirmation(userManager.email, verificationCode)
+        this.emailService.sendUserConfirmation(updatedUserManager.email, updatedUserManager.verificationCode)
 
-        return userManager;
+        return updatedUserManager;
 
     }
 
@@ -40,41 +42,63 @@ export class UsersService {
             const mangerForVerification = await this.userModel.findOneAndUpdate(
                 { verificationCode },
                 {
-                    verificationCode: verificationCode,
+                    verificationCode: "",
                 },
                 { new: true, useFindAndModify: false },
             );
 
-            console.log(verificationCode);
-            console.log(mangerForVerification);
+
 
             if (!mangerForVerification) {
                 throw new BadRequestException("No mangerForVerification")
             }
 
-            console.log(process.env.TOKEN_SECRET)
+            // console.log(process.env.TOKEN_SECRET)
 
             // access_token: this.jwtService.sign(payload)
-            console.log("-----")
+            // console.log("-----")
             const accessToken = this.jwtService.sign(
                 { mid: mangerForVerification._id, secret: process.env.TOKEN_SECRET ? process.env.TOKEN_SECRET : "qwerty", },
                 // { expiresIn: "30d" },
             );
-
-            console.log(accessToken)
-            console.log(mangerForVerification.email)
 
             return {
                 email: mangerForVerification.email,
                 token: accessToken,
             };
 
-            // return res.status(200).redirect('http://localhost:3001/managers/test')
-
         } catch (err) {
             throw new BadRequestException("Error")
         }
     };
+
+    async authorize(token) {
+
+        return "121212"
+        console.log("-------authorize----")
+
+        // if (!token) {
+        //     return null;
+        // }
+
+        // let parsedToken;
+
+        // try {
+        //     // parsedToken = await this.jwtService.verify(token, process.env.TOKEN_SECRET);
+        //     parsedToken = await this.jwtService.verify(token)
+        // } catch (err) {
+        //     return null;
+        // }
+
+        // let manager = await this.userModel.findOne({ _id: parsedToken.mid });
+
+        // if (!manager) {
+        //     return null;
+        // }
+
+        // return manager;
+
+    }
 
 
 

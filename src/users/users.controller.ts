@@ -4,13 +4,14 @@
 // export class UsersController {}
 
 
-import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Next, Param, Patch, Post, Put, Redirect, Req, Res } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Next, Param, Patch, Post, Put, Redirect, Req, Res, UseGuards, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Request, Response, } from 'express';
+import { Response, } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './user.schema';
 import { Model } from 'mongoose';
 import { ERole } from 'src/shared/enums/role.enum';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -48,17 +49,26 @@ export class UsersController {
         // }
     }
 
-    @Get()
-    @Redirect('https://google.com')
-    getRedirectOneTest() {
-        return 'Redirect-google';
-    }
+    // @Get()
+    // @HttpCode(HttpStatus.OK)
+    // getCurrentUser() {
+    //     return 'Redirect-google';
+    // }
+//==========================================
+    //    @Get()
+    //    @UseGuards(AuthGuard('jwt'))
+    //    async testGetAuth(@Request() req) {
+    //        // return "testGetauth"
+    //        return req.user;
+    //    }
 
     @Get()
-    getHello(): string {
-        return 'getHello';
+    @UseGuards(AuthGuard('local'))
+    async testGetAuth(@Request() req) {
+        // return "testGetauth"
+        return req.user;
     }
-
+//==========================================
     @Get(':id')
     getOneTestRestuct(@Param('id') id): string {
         return 'getOneTestRestuct ' + id;
@@ -81,9 +91,4 @@ export class UsersController {
         res.status(201).send({ q: 9 });
     }
 
-    @Delete()
-    deleteNativeExpress(@Res() res: Response, @Req() req: Request) {
-        res.status(200).send('deleteNativeExpress')
-        // return 'deleteNativeExpress'// will not work
-    }
 }
