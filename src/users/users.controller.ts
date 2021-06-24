@@ -1,9 +1,3 @@
-// import { Controller } from '@nestjs/common';
-
-// @Controller('users')
-// export class UsersController {}
-
-
 import { BadRequestException, Body, Controller, Delete, Get, Header, HttpCode, HttpStatus, Next, Param, Patch, Post, Put, Redirect, Req, Res, UseGuards, Request } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Response, } from 'express';
@@ -12,6 +6,7 @@ import { User, UserDocument } from './user.schema';
 import { Model } from 'mongoose';
 import { ERole } from 'src/shared/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
+import { Roles } from './authorization/roles.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -54,21 +49,23 @@ export class UsersController {
     // getCurrentUser() {
     //     return 'Redirect-google';
     // }
-//==========================================
-    //    @Get()
-    //    @UseGuards(AuthGuard('jwt'))
-    //    async testGetAuth(@Request() req) {
-    //        // return "testGetauth"
-    //        return req.user;
-    //    }
 
+    //==========================================
+    @UseGuards(AuthGuard('jwt'))
     @Get()
-    @UseGuards(AuthGuard('local'))
-    async testGetAuth(@Request() req) {
-        // return "testGetauth"
+    @Roles(ERole.Manager)
+    getUser(@Request() req) {
         return req.user;
     }
-//==========================================
+
+    // @Get()
+    // @UseGuards(AuthGuard('local'))
+    // async testGetAuth(@Request() req) {
+    //     // return "testGetauth"
+    //     return req.user;
+    // }
+    //==========================================
+
     @Get(':id')
     getOneTestRestuct(@Param('id') id): string {
         return 'getOneTestRestuct ' + id;

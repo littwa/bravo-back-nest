@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './authorization/roles.guard';
 
 @Module({
     imports: [
@@ -16,8 +18,17 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         SharedModule,
         PassportModule
     ],
-    providers: [UsersService, LocalStrategy, JwtStrategy],
+    providers: [UsersService, LocalStrategy, JwtStrategy, {
+        provide: APP_GUARD,
+        useClass: RolesGuard,
+    },],
     controllers: [UsersController],
     exports: [UsersService]
 })
 export class UsersModule { }
+
+
+// {
+//   provide: APP_GUARD,
+//   useClass: RolesGuard,
+// },

@@ -53,12 +53,13 @@ export class UsersService {
                 throw new BadRequestException("No mangerForVerification")
             }
 
-            // console.log(process.env.TOKEN_SECRET)
-
-            // access_token: this.jwtService.sign(payload)
-            // console.log("-----")
             const accessToken = this.jwtService.sign(
-                { mid: mangerForVerification._id, secret: process.env.TOKEN_SECRET ? process.env.TOKEN_SECRET : "qwerty", },
+                {
+                    mid: mangerForVerification._id,
+                    secret: process.env.TOKEN_SECRET,
+                    email: mangerForVerification.email,
+                    role: mangerForVerification.role
+                },
                 // { expiresIn: "30d" },
             );
 
@@ -72,33 +73,38 @@ export class UsersService {
         }
     };
 
-    async authorize(token) {
+    // async authorize(payload) {
 
-        return "121212"
-        console.log("-------authorize----")
+    //     let userManager = await this.userModel.findOne({ _id: payload.mid });
 
-        // if (!token) {
-        //     return null;
-        // }
 
-        // let parsedToken;
 
-        // try {
-        //     // parsedToken = await this.jwtService.verify(token, process.env.TOKEN_SECRET);
-        //     parsedToken = await this.jwtService.verify(token)
-        // } catch (err) {
-        //     return null;
-        // }
 
-        // let manager = await this.userModel.findOne({ _id: parsedToken.mid });
+    //     // console.log("-------authorize----")
 
-        // if (!manager) {
-        //     return null;
-        // }
+    //     return userManager
+    //     // if (!token) {
+    //     //     return null;
+    //     // }
 
-        // return manager;
+    //     // let parsedToken;
 
-    }
+    //     // try {
+    //     //     // parsedToken = await this.jwtService.verify(token, process.env.TOKEN_SECRET);
+    //     //     parsedToken = await this.jwtService.verify(token)
+    //     // } catch (err) {
+    //     //     return null;
+    //     // }
+
+    //     // let manager = await this.userModel.findOne({ _id: parsedToken.mid });
+
+    //     // if (!manager) {
+    //     //     return null;
+    //     // }
+
+    //     // return manager;
+
+    // }
 
 
 

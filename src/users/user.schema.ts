@@ -46,6 +46,9 @@ export class User {
     @Prop({ type: String, default: "", required: false })
     sessionToken: string
 
+    @Prop({ type: String, default: "", required: false })
+    accessToken: string
+
 
     //     @Prop({ type: ObjectId, ref: "Good" })
     //    favoritCustomers: ObjectId

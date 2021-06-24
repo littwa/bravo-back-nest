@@ -12,12 +12,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       ignoreExpiration: true,
       secretOrKey: process.env.TOKEN_SECRET,
     });
-
-
   }
 
-  async validate(payload: any) {
-    console.log(payload)
-    return { ...payload };
+  validate(payload: any) {
+    const { mid: _id, email, role } = payload;
+    console.log(4444444, { _id, email, role })
+    return { _id, email, role };
   }
 }

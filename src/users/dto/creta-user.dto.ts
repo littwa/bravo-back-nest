@@ -25,4 +25,6 @@ export class createUserDto {
 
     readonly sessionToken?: string;
 
+    readonly accessToken?: string;
+
 }
