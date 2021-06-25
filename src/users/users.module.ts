@@ -26,9 +26,3 @@ import { RolesGuard } from './authorization/roles.guard';
     exports: [UsersService]
 })
 export class UsersModule { }
-
-
-// {
-//   provide: APP_GUARD,
-//   useClass: RolesGuard,
-// },

@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { ERole } from 'src/shared/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from './authorization/roles.decorator';
+import { RolesGuard } from './authorization/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -44,48 +45,42 @@ export class UsersController {
         // }
     }
 
-    // @Get()
-    // @HttpCode(HttpStatus.OK)
-    // getCurrentUser() {
-    //     return 'Redirect-google';
-    // }
-
-    //==========================================
-    @UseGuards(AuthGuard('jwt'))
+    //=========================================================
     @Get()
+    @UseGuards(AuthGuard('jwt'))
     @Roles(ERole.Manager)
-    getUser(@Request() req) {
+    getCurrentMeneger(@Request() req) {
         return req.user;
     }
 
-    // @Get()
-    // @UseGuards(AuthGuard('local'))
-    // async testGetAuth(@Request() req) {
-    //     // return "testGetauth"
-    //     return req.user;
+        // @Get()
+        // @UseGuards(AuthGuard('local'))
+        // async getCurrentMeneger(@Request() req) {
+        //     // return "testGetauth"
+        //     return req.user;
+        // }
+    //============================================================
+
+    // @Get(':id')
+    // getOneTestRestuct(@Param('id') id): string {
+    //     return 'getOneTestRestuct ' + id;
     // }
-    //==========================================
 
-    @Get(':id')
-    getOneTestRestuct(@Param('id') id): string {
-        return 'getOneTestRestuct ' + id;
-    }
+    // @Get(':id')
+    // getOneTest(@Param() params): string {
+    //     return 'getOneTest' + params.id;
+    // }
 
-    @Get(':id')
-    getOneTest(@Param() params): string {
-        return 'getOneTest' + params.id;
-    }
+    // @Put()
+    // @HttpCode(HttpStatus.CREATED)
+    // @Header("AnyHeader", "any_header_text")
+    // putOneTest() {
+    //     return 'HttpStatusTest';
+    // }
 
-    @Put()
-    @HttpCode(HttpStatus.CREATED)
-    @Header("AnyHeader", "any_header_text")
-    putOneTest() {
-        return 'HttpStatusTest';
-    }
-
-    @Patch()
-    testNativeExpress(@Res() res, @Req() req) {
-        res.status(201).send({ q: 9 });
-    }
+    // @Patch()
+    // testNativeExpress(@Res() res, @Req() req) {
+    //     res.status(201).send({ q: 9 });
+    // }
 
 }
