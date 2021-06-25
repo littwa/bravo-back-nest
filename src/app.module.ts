@@ -7,9 +7,11 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from "./shared/configs/base.config"
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './users/authorization/roles.guard';
+import { CustomersModule } from './customers/customers.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true, load: [configuration] }), MongooseModule.forRoot(process.env.MONGO_URL), UsersModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true, load: [configuration] }), MongooseModule.forRoot(process.env.MONGO_URL), UsersModule, CustomersModule, OrdersModule],
   controllers: [AppController],
   providers: [AppService,],
 })

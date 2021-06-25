@@ -33,16 +33,12 @@ export class UsersController {
     @HttpCode(HttpStatus.OK)
     getVerifycationUser(@Param() param): any {
         return this.userService.verifycationManager(param)
-        // switch (body.role) {
-        //     case ERole.Manager:
-        //         return this.userService.verifycationManager(param)
-        //     case ERole.Customer:
-        //         return this.userService.verifycationManager(param)
-        //     case ERole.Admin:
-        //         return this.userService.verifycationManager(param)
-        //     default:
-        //         return new BadRequestException("unknown role")
-        // }
+    }
+
+    @Get("current")
+    @UseGuards(AuthGuard('jwt'))
+    getCurrentUser(@Request() req) {
+        return req.user;
     }
 
     //=========================================================
@@ -53,12 +49,13 @@ export class UsersController {
         return req.user;
     }
 
-        // @Get()
-        // @UseGuards(AuthGuard('local'))
-        // async getCurrentMeneger(@Request() req) {
-        //     // return "testGetauth"
-        //     return req.user;
-        // }
+    // @Get()
+    // @UseGuards(AuthGuard('local'))
+    // async getCurrentMeneger(@Request() req) {
+    //     // return "testGetauth"
+    //     return req.user;
+    // }
+
     //============================================================
 
     // @Get(':id')
