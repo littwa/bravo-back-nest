@@ -5,7 +5,7 @@ import { DeliveryDays } from 'src/shared/interfaces/prop.interfaces';
 export type CustomerDocument = Customer & Document;
 
 @Schema()
-export class Customer {
+export class Customer extends Document {
     @Prop({ type: String, required: true })
     name: string;
 

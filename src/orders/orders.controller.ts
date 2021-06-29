@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 
 
@@ -16,8 +16,31 @@ export class OrdersController {
     @Get()
     @HttpCode(HttpStatus.OK)
     getOrders() {
+        return this.ordersService.getOrders()
+    }
+
+    @Get("aggregate")
+    @HttpCode(HttpStatus.OK)
+    getOrdersAggregate() {
         return this.ordersService.getOrdersWithProducts()
-        // return this.ordersService.getOrders()
+    }
+
+    @Patch("confirmed/:orderId")
+    @HttpCode(HttpStatus.OK)
+    confirmOrderStatus(@Param() param) {
+        return this.ordersService.changeStatusToConfirmed(param.orderId);
+    }
+
+    @Patch("add-product/:orderId")
+    @HttpCode(HttpStatus.OK)
+    addProductsToOrderProdList(@Body() body, @Param() param) {
+        return this.ordersService.addProductsToOrder(body, param.orderId);
+    }
+
+    @Patch("del-product/:orderId")
+    @HttpCode(HttpStatus.OK)
+    delProductsFromOrderProdList(@Body() body, @Param() param) {
+        return this.ordersService.removeProductsFromOrder(body, param.orderId);
     }
 
 }

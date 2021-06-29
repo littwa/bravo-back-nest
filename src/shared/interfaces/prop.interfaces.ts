@@ -24,3 +24,10 @@ export interface ICustomer {
     mobilePhone: string;
     notifyCustomerMessage: boolean;
 }
+
+export interface IPrice {
+    kg?: string,
+    pcs?: string,
+    box?: string
+}
+

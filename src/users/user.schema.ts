@@ -4,7 +4,7 @@ import { Document, ObjectId } from 'mongoose';
 export type UserDocument = User & Document;
 
 @Schema()
-export class User {
+export class User extends Document {
     @Prop({ type: String, required: true, default: "testmail@tst.com" })
     email: string;
 
