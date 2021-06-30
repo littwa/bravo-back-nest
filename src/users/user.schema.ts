@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
+import * as mongoose from 'mongoose';
+import { Order } from 'src/orders/orders.schema';
 
 export type UserDocument = User & Document;
 
@@ -30,6 +32,9 @@ export class User extends Document {
     password: string
 
     @Prop({ type: String, default: "", required: false })
+    username: string
+
+    @Prop({ type: String, default: "", required: false })
     avatarURL: string
 
     @Prop({
@@ -48,6 +53,9 @@ export class User extends Document {
 
     @Prop({ type: String, default: "", required: false })
     accessToken: string
+
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
+    ordersList: Order[];
 
 
     //     @Prop({ type: ObjectId, ref: "Good" })

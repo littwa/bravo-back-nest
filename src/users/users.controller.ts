@@ -14,34 +14,49 @@ export class UsersController {
 
     constructor(private readonly userService: UsersService) { }
 
-    @Post()
+    @Post("register")
     @HttpCode(HttpStatus.CREATED)
     postSignUpUser(@Body() body): any {
         switch (body.role) {
             case ERole.Manager:
                 return this.userService.createUserManager(body)
             case ERole.Customer:
-                return this.userService.createUserManager(body)
+                return "Not implemented temporarily"
             case ERole.Admin:
-                return this.userService.createUserManager(body)
+                return this.userService.createUserAdmin(body)
             default:
                 return new BadRequestException("unknown role")
         }
     }
 
-    @Get("manager/:verificationCode")
+    @Get("manager/verify/:verificationCode")
     @HttpCode(HttpStatus.OK)
     getVerifycationUser(@Param() param): any {
         return this.userService.verifycationManager(param)
     }
 
-    @Get("current")
+    @Get("get")
     @UseGuards(AuthGuard('jwt'))
     getCurrentUser(@Request() req) {
         return req.user;
     }
 
-    //=========================================================
+    //=====================================================
+
+
+    @Get("admin/verify/:verificationCode")
+    @HttpCode(HttpStatus.OK)
+    verifycationAdmin(@Param() param): any {
+        return this.userService.verifycationAdmin(param.verificationCode)
+    }
+
+    @Post("sign-in")
+    signUpAdminOrCustomer(@Body() body) {
+        return this.userService.signIn(body);
+    }
+
+    //======================================================
+
     @Get()
     @UseGuards(AuthGuard('jwt'))
     @Roles(ERole.Manager)
@@ -49,35 +64,17 @@ export class UsersController {
         return req.user;
     }
 
-    // @Get()
-    // @UseGuards(AuthGuard('local'))
-    // async getCurrentMeneger(@Request() req) {
-    //     // return "testGetauth"
-    //     return req.user;
-    // }
+    @Get("local")
+    @UseGuards(AuthGuard('local'))
+    testAuthGuardLocal(@Request() req) {
+        return req.user;
+    }
 
     //============================================================
 
-    // @Get(':id')
-    // getOneTestRestuct(@Param('id') id): string {
-    //     return 'getOneTestRestuct ' + id;
-    // }
 
-    // @Get(':id')
-    // getOneTest(@Param() params): string {
-    //     return 'getOneTest' + params.id;
-    // }
 
-    // @Put()
-    // @HttpCode(HttpStatus.CREATED)
-    // @Header("AnyHeader", "any_header_text")
-    // putOneTest() {
-    //     return 'HttpStatusTest';
-    // }
 
-    // @Patch()
-    // testNativeExpress(@Res() res, @Req() req) {
-    //     res.status(201).send({ q: 9 });
-    // }
+
 
 }

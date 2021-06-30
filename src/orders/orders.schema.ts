@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
-import { Customer, CustomerSchema } from 'src/customers/customers.schema';
-import { ICustomer, IDate } from 'src/shared/interfaces/prop.interfaces';
 import * as mongoose from 'mongoose';
+import { Customer, CustomerSchema } from 'src/customers/customers.schema'; // check how it works
+import { ICustomer, IDate } from 'src/shared/interfaces/prop.interfaces';
 import { Product } from 'src/products/products.schema';
 
 
@@ -25,7 +25,7 @@ export class Order extends Document {
     @Prop({ type: String, required: true })
     notes: string;
 
-    @Prop({ type: Boolean, required: true })
+    @Prop({ type: Boolean, default: 'new', enum: ['new', 'canceled', 'in progress', 'deliverred', 'completed',] })
     status: boolean;
 
     @Prop({ type: Object, required: true })
@@ -38,7 +38,7 @@ export class Order extends Document {
     productsList: Product[];
 
     //@Prop({ type: [CustomerSchema] })
-    // productsList: ICustomer[]; /// !!! Change to Product !!! How Work  ?????????
+    // productsList: ICustomer[]; //  Сheck how it works  ?????????
 
 }
 

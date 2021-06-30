@@ -10,13 +10,16 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './authorization/roles.guard';
+import { OrdersModule } from 'src/orders/orders.module';
+import { Session, SessionSchema } from './session.schema';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-        JwtModule.registerAsync({ useFactory: () => ({ secret: process.env.TOKEN_SECRET, signOptions: { expiresIn: '60d' } }) }),
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }, { name: Session.name, schema: SessionSchema }]),
+        JwtModule.registerAsync({ useFactory: () => ({ secret: process.env.TOKEN_SECRET, signOptions: { expiresIn: '5d' } }) }),
         SharedModule,
-        PassportModule
+        PassportModule,
+        OrdersModule
     ],
     providers: [UsersService, LocalStrategy, JwtStrategy, {
         provide: APP_GUARD,

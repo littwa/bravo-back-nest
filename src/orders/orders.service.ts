@@ -96,7 +96,6 @@ export class OrdersService {
         console.log(product)
         if (!product) throw new NotFoundException(`Can't find products for for in this order`);
 
-
         const updatedUser = await this.orderModel.findByIdAndUpdate(orderId, {
             $pull: { productsList: body.productId }
         }, { new: true });
