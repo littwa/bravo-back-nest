@@ -7,17 +7,8 @@ export type SessionDocument = Session & Document;
 
 @Schema()
 export class Session extends Document {
-    @Prop({ type: Types.ObjectId }) // check
-    uid: Types.ObjectId;
-
-
-    // @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
-    // ordersList: Order[];
-
-    // uid: { type: Schema.Types.ObjectId },
-
-    //     @Prop({ type: ObjectId, ref: "Good" })
-    //    favoritCustomers: ObjectId
+    @Prop({ type: mongoose.Schema.Types.ObjectId }) // check
+    uid: string;
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);

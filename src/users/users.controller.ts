@@ -53,8 +53,6 @@ export class UsersController {
         return this.userService.signIn(body);
     }
 
-    //======================================================
-
     @Get()
     @UseGuards(AuthGuard('jwt'))
     @Roles(ERole.Admin)
@@ -68,8 +66,6 @@ export class UsersController {
         return req.user;
     }
 
-    //============================================================
-
     @Get("get/user-customer-info")
     @UseGuards(AuthGuard('jwt'))
     // @Roles(ERole.Admin)
@@ -77,9 +73,9 @@ export class UsersController {
         return this.userService.getInfoUserCustomer(req.user);
     }
 
-
-
-
-
+    @Get("refresh")
+    getRefreshToken(@Req() req) {
+        return this.userService.getRefreshToken(req)
+    }
 
 }

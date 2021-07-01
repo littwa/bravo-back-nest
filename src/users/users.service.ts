@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotAcceptableException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Model, Types, ObjectId, Schema } from 'mongoose';
@@ -101,7 +101,7 @@ export class UsersService {
             password: hashPassword,
             verificationCode: code,
             status: EStatus.NotVerified,
-            customer: Types.ObjectId(createUserCustomerDto.customer)
+            customer: createUserCustomerDto.customer
         });
 
         this.emailService.sendUserConfirmation(user.email, user.verificationCode)
@@ -130,13 +130,7 @@ export class UsersService {
         }; // Redirect on sign-in
     };
 
-    //===================================================================================
 
-    // async createUserCustomer(createUserCustomerDto: createUserCustomerDto): Promise<object> {
-    //     return
-    // } ///// TO Work
-
-    //============================================================================================
 
     async signIn(signInDto) {
 
@@ -150,7 +144,7 @@ export class UsersService {
         if (!isPasswordValid) throw new BadRequestException("Password wrong");
         if (user.status !== "Verified") throw new BadRequestException("User not verified");
 
-        const userObjectId = Types.ObjectId(user._id); // Check!!!
+        const userObjectId = user._id; // Check!!!
 
         console.log(userObjectId);
 
@@ -158,26 +152,28 @@ export class UsersService {
             uid: userObjectId,
         });
 
-        const accessToken = await this.jwtService.sign(
-            {
-                sid: createSession._id,
-                uid: createSession.uid,
-                secret: process.env.TOKEN_SECRET,
-                email: user.email,
-                role: user.role
-            },
-            { expiresIn: "2d" },
-        );
-        const refreshToken = await this.jwtService.sign(
-            {
-                sid: createSession._id,
-                uid: createSession.uid,
-                secret: process.env.TOKEN_SECRET,
-                email: user.email,
-                role: user.role
-            },
-            { expiresIn: "30d" },
-        );
+        // const accessToken = await this.jwtService.sign(
+        //     {
+        //         sid: createSession._id,
+        //         uid: createSession.uid,
+        //         secret: process.env.TOKEN_SECRET,
+        //         email: user.email,
+        //         role: user.role
+        //     },
+        //     { expiresIn: "2d" },
+        // );
+        // const refreshToken = await this.jwtService.sign(
+        //     {
+        //         sid: createSession._id,
+        //         uid: createSession.uid,
+        //         secret: process.env.TOKEN_SECRET,
+        //         email: user.email,
+        //         role: user.role
+        //     },
+        //     { expiresIn: "30d" },
+        // );
+
+        const tokens = await this.getPairTokensUtilit(createSession, user)
 
         return {
             user: {
@@ -186,7 +182,7 @@ export class UsersService {
                 status: user.status,
                 role: user.role,
             },
-            tokens: { accessToken: accessToken, refreshToken: refreshToken },
+            tokens
         }
     };
 
@@ -195,6 +191,55 @@ export class UsersService {
         if (!infoCusomer) throw new BadRequestException("Customer was not found");
         const { password, verificationCode, __v, ...userDtoInfo } = infoCusomer.toObject();
         return userDtoInfo
+    }
+
+    async getRefreshToken(req) {
+
+        const token = req.get("Authorization" || "").slice(7);
+
+        const parsedToken = await this.jwtService.verify(token, { secret: process.env.TOKEN_SECRET });
+
+        if (!parsedToken) throw new UnauthorizedException("Not authorized");
+
+        let session = await this.sessionModel.findById(parsedToken.sid);
+        let user = await this.userModel.findById(parsedToken.uid);
+
+        if (!session || !user || user._id.toString() !== session.uid.toString()) throw new UnauthorizedException("Not authorized");
+
+        let ff = await this.sessionModel.findByIdAndDelete(parsedToken.sid);
+
+
+        const newSession = await this.sessionModel.create({ uid: parsedToken.uid });
+
+        const newPairTokens = this.getPairTokensUtilit(newSession, user)
+
+        return newPairTokens;
+
+    };
+
+    getPairTokensUtilit = async (session, user) => {
+        const accessToken = await this.jwtService.sign(
+            {
+                sid: session._id,
+                uid: session.uid,
+                secret: process.env.TOKEN_SECRET,
+                email: user.email,
+                role: user.role
+            },
+            { expiresIn: "2d" },
+        );
+        const refreshToken = await this.jwtService.sign(
+            {
+                sid: session._id,
+                uid: session.uid,
+                secret: process.env.TOKEN_SECRET,
+                email: user.email,
+                role: user.role
+            },
+            { expiresIn: "30d" },
+        );
+
+        return { accessToken, refreshToken }
     }
 
 }
