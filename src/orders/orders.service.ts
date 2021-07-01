@@ -1,16 +1,20 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types, ObjectId } from 'mongoose';
 import { Product, ProductDocument } from 'src/products/products.schema';
+import { EOrderStatus } from 'src/shared/enums/props.enum';
 import { Order, OrderDocument } from './orders.schema';
+import { createOrderDto } from './dto/create-order.dto'
 
 @Injectable()
 export class OrdersService {
     constructor(@InjectModel(Order.name) private orderModel: Model<OrderDocument>, @InjectModel(Product.name) private productModel: Model<ProductDocument>) { }
 
-    async createOrder(createOrderDto) {
+    async createOrder(createOrderDto: createOrderDto) {
         const newOrder = await this.orderModel.create({
             ...createOrderDto,
+            // customerId: Types.ObjectId(createOrderDto.customerId),
+            // productsList: createOrderDto.productsList.map((id: string) => Types.ObjectId(id))
         });
 
         if (!newOrder) throw new NotFoundException(`Can't create order`);
@@ -19,7 +23,7 @@ export class OrdersService {
 
     async getOrdersWithProducts() {
 
-        const aggregate = await this.orderModel.find().populate("productsList");
+        const aggregate = await this.orderModel.find().populate("customerId").populate("productsList");
         if (!aggregate) throw new NotFoundException(`Can't aggregate orders`);
         return aggregate;
 
@@ -32,12 +36,12 @@ export class OrdersService {
         return allOrders;
     };
 
-    async changeStatusToConfirmed(orderId) {
+    async changeOrderStatus(orderId, status: EOrderStatus) {
 
         let updatedOrder: any = await this.orderModel.findByIdAndUpdate(
             orderId,
             {
-                $set: { status: true },
+                $set: { status },
             },
             {
                 new: true,
@@ -47,7 +51,7 @@ export class OrdersService {
 
         updatedOrder = false;
 
-        if (!updatedOrder) throw new NotFoundException(`Can't change status order id:${orderId} to confirmed`);
+        if (!updatedOrder) throw new NotFoundException(`Can't change status order id:${orderId}`);
         return updatedOrder;
     };
 
@@ -55,7 +59,13 @@ export class OrdersService {
 
         const updatedOrder = await this.orderModel.findByIdAndUpdate(
             orderId,
-            { $set: updatedOrderDto },
+            {
+                $set: {
+                    ...updatedOrderDto,
+                    // customerId: Types.ObjectId(updatedOrderDto.customerId),
+                    // productsList: updatedOrderDto.productsList.map((id: string) => Types.ObjectId(id))
+                }
+            },
             { new: true, useFindAndModify: false },
         );
 

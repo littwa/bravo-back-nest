@@ -18,21 +18,19 @@ export class UsersController {
     @HttpCode(HttpStatus.CREATED)
     postSignUpUser(@Body() body): any {
         switch (body.role) {
-            case ERole.Manager:
-                return this.userService.createUserManager(body)
-            case ERole.Customer:
-                return "Not implemented temporarily"
             case ERole.Admin:
                 return this.userService.createUserAdmin(body)
+            case ERole.Customer:
+                return this.userService.createUserCustomer(body)
             default:
                 return new BadRequestException("unknown role")
         }
     }
 
-    @Get("manager/verify/:verificationCode")
+    @Get("admin/verify/:verificationCode")
     @HttpCode(HttpStatus.OK)
     getVerifycationUser(@Param() param): any {
-        return this.userService.verifycationManager(param)
+        return this.userService.verifycationAdmin(param)
     }
 
     @Get("get")
@@ -44,14 +42,14 @@ export class UsersController {
     //=====================================================
 
 
-    @Get("admin/verify/:verificationCode")
+    @Get("customer/verify/:verificationCode")
     @HttpCode(HttpStatus.OK)
-    verifycationAdmin(@Param() param): any {
-        return this.userService.verifycationAdmin(param.verificationCode)
+    verifycationCustomer(@Param() param): any {
+        return this.userService.verifycationCustomer(param.verificationCode)
     }
 
     @Post("sign-in")
-    signUpAdminOrCustomer(@Body() body) {
+    signUpCustomer(@Body() body) {
         return this.userService.signIn(body);
     }
 
@@ -59,7 +57,7 @@ export class UsersController {
 
     @Get()
     @UseGuards(AuthGuard('jwt'))
-    @Roles(ERole.Manager)
+    @Roles(ERole.Admin)
     getCurrentMeneger(@Request() req) {
         return req.user;
     }
@@ -71,6 +69,13 @@ export class UsersController {
     }
 
     //============================================================
+
+    @Get("get/user-customer-info")
+    @UseGuards(AuthGuard('jwt'))
+    // @Roles(ERole.Admin)
+    getCustomer(@Request() req) {
+        return this.userService.getInfoUserCustomer(req.user);
+    }
 
 
 

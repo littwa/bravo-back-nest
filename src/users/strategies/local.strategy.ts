@@ -9,13 +9,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super()
   }
 
-  // {
-  //   // default fields: `username`, `password`
-  //   usernameField: 'token',
-  // }
-
   async validate(username: string, password: string) {
-    // console.log(username, password)
+
     return { username, password }
   }
 

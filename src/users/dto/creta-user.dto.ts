@@ -11,20 +11,21 @@ export class createUserDto {
     readonly age?: string;
     readonly avatarURL?: string;
     readonly status?: string;
-    readonly verificationToken?: string;
-    readonly sessionToken?: string;
-    readonly accessToken?: string;
-}
-
-export class createUserAdminDto extends createUserDto {
-    readonly password: string;
-    readonly username: string;
+    // readonly verificationToken?: string;
+    // readonly sessionToken?: string;
+    // readonly accessToken?: string;
 }
 
 export class createUserCustomerDto extends createUserDto {
     readonly password: string;
     readonly username: string;
-    readonly age: string;
+    readonly customer?: string;
 }
+
+// export class createUserCustomerDto extends createUserDto {
+//     readonly password: string;
+//     readonly username: string;
+//     readonly age: string;
+// }
 
 

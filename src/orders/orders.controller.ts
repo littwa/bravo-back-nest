@@ -27,8 +27,8 @@ export class OrdersController {
 
     @Patch("confirmed/:orderId")
     @HttpCode(HttpStatus.OK)
-    confirmOrderStatus(@Param() param) {
-        return this.ordersService.changeStatusToConfirmed(param.orderId);
+    changeOrderStatus(@Param() param, @Body() body) {
+        return this.ordersService.changeOrderStatus(param.orderId, body.status);
     }
 
     @Patch("add-product/:orderId")
@@ -42,5 +42,11 @@ export class OrdersController {
     delProductsFromOrderProdList(@Body() body, @Param() param) {
         return this.ordersService.removeProductsFromOrder(body, param.orderId);
     }
+
+    // @Patch("confirmed/:orderId")
+    // @HttpCode(HttpStatus.OK)
+    // changeOrderStatus(@Param() param) {
+    //     return this.ordersService.changeStatusToConfirmed(param.orderId);
+    // }
 
 }

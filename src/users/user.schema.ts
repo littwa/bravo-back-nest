@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
-import * as mongoose from 'mongoose';
+import { Document, ObjectId, Types } from 'mongoose';
 import { Order } from 'src/orders/orders.schema';
+import { Customer } from 'src/customers/customers.schema';
 
 export type UserDocument = User & Document;
 
@@ -19,7 +19,7 @@ export class User extends Document {
     @Prop({ type: String, required: false, default: "25" })
     age: string;
 
-    @Prop({ type: String, required: true, enum: ["manager", "customer", "admin"] })
+    @Prop({ type: String, required: true, enum: ["customer", "admin"] })
     role: string;
 
     @Prop({ type: String, default: "" })
@@ -45,17 +45,20 @@ export class User extends Document {
     })
     status: string
 
-    @Prop({ type: String, default: "", required: false })
-    verificationToken: string
+    // @Prop({ type: String, default: "", required: false })
+    // verificationToken: string
 
-    @Prop({ type: String, default: "", required: false })
-    sessionToken: string
+    // @Prop({ type: String, default: "", required: false })
+    // sessionToken: string
 
-    @Prop({ type: String, default: "", required: false })
-    accessToken: string
+    // @Prop({ type: String, default: "", required: false })
+    // accessToken: string
 
-    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] })
+    @Prop({ type: [{ type: Types.ObjectId, ref: 'Order' }] })
     ordersList: Order[];
+
+    @Prop({ type: Types.ObjectId, ref: 'Customer', required: false })
+    customer: Customer;
 
 
     //     @Prop({ type: ObjectId, ref: "Good" })

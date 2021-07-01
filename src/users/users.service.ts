@@ -2,13 +2,11 @@ import { BadRequestException, HttpException, HttpStatus, Injectable, NotAcceptab
 import { InjectModel } from '@nestjs/mongoose';
 
 import { Model, Types, ObjectId, Schema } from 'mongoose';
-
-import * as mongoose from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import { ERole, EStatus } from "../shared/enums/role.enum";
 import { EmailService } from 'src/email/email.service';
 import { JwtService } from '@nestjs/jwt';
-import { createUserAdminDto, createUserDto, createUserCustomerDto } from './dto/creta-user.dto'
+import { createUserCustomerDto, createUserDto, } from './dto/creta-user.dto'
 import { Order, OrderDocument } from 'src/orders/orders.schema';
 import * as bcrypt from 'bcrypt';
 import { Session, SessionDocument } from './session.schema';
@@ -22,31 +20,33 @@ export class UsersService {
         private emailService: EmailService,
         private jwtService: JwtService) { }
 
-    async createUserManager(createUserDto: createUserDto): Promise<User> {
+    async createUserAdmin(createUserDto: createUserDto): Promise<object> {
 
-        let userManager = await this.userModel.findOne({ email: createUserDto.email });
+        let userAdmin = await this.userModel.findOne({ email: createUserDto.email, role: ERole.Admin });
 
-        if (!userManager) {
-            userManager = await this.userModel.create({
+        if (!userAdmin) {
+            userAdmin = await this.userModel.create({
                 ...createUserDto,
             });
         }
 
         const code = (Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString();
 
-        const updatedUserManager = await this.userModel.findByIdAndUpdate(
-            userManager._id,
+        const updatedUserAdmin = await this.userModel.findByIdAndUpdate(
+            userAdmin._id,
             { verificationCode: code, status: EStatus.NotVerified },
             { new: true, useFindAndModify: false },
         );
 
-        this.emailService.sendUserConfirmation(updatedUserManager.email, updatedUserManager.verificationCode)
+        this.emailService.sendUserConfirmation(updatedUserAdmin.email, updatedUserAdmin.verificationCode)
 
-        return updatedUserManager;
+        const { password, verificationCode, __v, ...userAdminDtoReverse } = updatedUserAdmin.toObject();
+
+        return userAdminDtoReverse;
 
     }
 
-    async verifycationManager(param) {
+    async verifycationAdmin(param) {
         try {
             const { verificationCode } = param;
             const mangerForVerification = await this.userModel.findOneAndUpdate(
@@ -84,21 +84,24 @@ export class UsersService {
 
     //===================================================
 
-    async createUserAdmin(createUserAdminDto: createUserAdminDto): Promise<object> {
+    async createUserCustomer(createUserCustomerDto: createUserCustomerDto): Promise<object> {
 
-        let user = await this.userModel.findOne({ email: createUserAdminDto.email, role: ERole.Admin });
+        let user = await this.userModel.findOne({ email: createUserCustomerDto.email, role: ERole.Customer });
 
-        if (user) throw new BadRequestException("User admin with current email is registered")
+        if (user) throw new BadRequestException("User customer with current email is registered")
 
-        const hashPassword = await bcrypt.hash(createUserAdminDto.password, 5);
+        const hashPassword = await bcrypt.hash(createUserCustomerDto.password, 5);
 
         const code = (Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000).toString();
 
+        console.log(createUserCustomerDto)
+
         user = await this.userModel.create({
-            ...createUserAdminDto,
+            ...createUserCustomerDto,
             password: hashPassword,
             verificationCode: code,
-            status: EStatus.NotVerified
+            status: EStatus.NotVerified,
+            customer: Types.ObjectId(createUserCustomerDto.customer)
         });
 
         this.emailService.sendUserConfirmation(user.email, user.verificationCode)
@@ -109,38 +112,29 @@ export class UsersService {
 
     }
 
-    async verifycationAdmin(verificationCode) {
+    async verifycationCustomer(verificationCode) {
 
-        const adminForVerification = await this.userModel.findOneAndUpdate(
+        const customerForVerification = await this.userModel.findOneAndUpdate(
             { verificationCode },
             { verificationCode: "", status: EStatus.Verified },
             { new: true, useFindAndModify: false },
         );
 
-        if (!adminForVerification) throw new BadRequestException("No adminForVerification");
-
-        // const accessToken = this.jwtService.sign(
-        //     {
-        //         uid: adminForVerification._id,
-        //         secret: process.env.TOKEN_SECRET,
-        //         email: adminForVerification.email,
-        //         role: adminForVerification.role
-        //     },
-        //     // { expiresIn: "30d" },
-        // );
+        if (!customerForVerification) throw new BadRequestException("No customer For Verification");
 
         return {
-            email: adminForVerification.email,
-            status: adminForVerification.status,
-            username: adminForVerification.username,
-            role: adminForVerification.role,
-            // token: accessToken,
+            email: customerForVerification.email,
+            status: customerForVerification.status,
+            username: customerForVerification.username,
+            role: customerForVerification.role,
         }; // Redirect on sign-in
     };
 
     //===================================================================================
 
-    async createUserCustomer(createUserCustomerDto: createUserCustomerDto): Promise<object> { return } ///// TO Work
+    // async createUserCustomer(createUserCustomerDto: createUserCustomerDto): Promise<object> {
+    //     return
+    // } ///// TO Work
 
     //============================================================================================
 
@@ -148,7 +142,7 @@ export class UsersService {
 
         const { email, password } = signInDto;
 
-        const user = await this.userModel.findOne({ email, role: "admin" || "customer" });
+        const user = await this.userModel.findOne({ email, role: ERole.Customer });
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -195,5 +189,12 @@ export class UsersService {
             tokens: { accessToken: accessToken, refreshToken: refreshToken },
         }
     };
+
+    async getInfoUserCustomer({ _id }) {
+        const infoCusomer = await this.userModel.findOne({ _id, role: ERole.Customer }).populate("customer");
+        if (!infoCusomer) throw new BadRequestException("Customer was not found");
+        const { password, verificationCode, __v, ...userDtoInfo } = infoCusomer.toObject();
+        return userDtoInfo
+    }
 
 }

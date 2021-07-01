@@ -11,7 +11,7 @@ export class CustomersService {
 
     async getCustomers() {
         const allCustomers = await this.customerModel.find();
-        if (!allCustomers) throw new NotFoundException(`Can't get all customers`);
+        if (allCustomers.length === 0) throw new NotFoundException(`Can't get all customers`);
         return allCustomers;
     };
 
