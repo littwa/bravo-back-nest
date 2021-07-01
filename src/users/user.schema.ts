@@ -9,16 +9,16 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User extends Document {
-    @Prop({ type: String, required: true, default: "testmail@tst.com" })
+    @Prop({ type: String, required: true, })
     email: string;
 
-    @Prop({ type: String, required: false, default: "Boba" })
+    @Prop({ type: String, required: false, default: "" })
     firstName: string;
 
-    @Prop({ type: String, required: false, default: "Dik" })
+    @Prop({ type: String, required: false, default: "" })
     lastName: string;
 
-    @Prop({ type: String, required: false, default: "25" })
+    @Prop({ type: String, required: false, default: "" })
     age: string;
 
     @Prop({ type: String, required: true, enum: ["customer", "admin"] })
