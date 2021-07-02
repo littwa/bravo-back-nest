@@ -47,7 +47,7 @@ export class ProductsService {
         if (!deletedProduct) throw new NotFoundException(`Can't del Product`);
 
         console.log("deletedProduct", deletedProduct, productId)
-        return `Product ById: ${productId} has been successfully deleted!`;
+        return `Product ById: ${productId} has been deleted!`;
     };
 
 }

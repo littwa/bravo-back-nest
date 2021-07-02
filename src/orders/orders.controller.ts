@@ -38,7 +38,7 @@ export class OrdersController {
     }
 
     @Patch("del-product/:orderId")
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.NO_CONTENT)
     delProductsFromOrderProdList(@Body() body, @Param() param) {
         return this.ordersService.removeProductsFromOrder(body, param.orderId);
     }

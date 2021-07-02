@@ -24,7 +24,7 @@ export class ProductsController {
     }
 
     @Delete("del/:productId")
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.NO_CONTENT)
     delProduct(@Param() param) {
         return this.productsService.deleteProduct(param.productId)
     }

@@ -75,6 +75,7 @@ export class UsersService {
             return {
                 email: mangerForVerification.email,
                 token: accessToken,
+                role: mangerForVerification.role
             };
 
         } catch (err) {

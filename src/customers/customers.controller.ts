@@ -25,7 +25,7 @@ export class CustomersController {
     }
 
     @Delete("del/:customerId")
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.NO_CONTENT)
     delCustomer(@Param() param) {
         return this.customersService.deleteCustomer(param.customerId)
     }
