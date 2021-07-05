@@ -115,6 +115,7 @@ export class UsersService {
 
     async verifycationCustomer(verificationCode) {
 
+
         const customerForVerification = await this.userModel.findOneAndUpdate(
             { verificationCode },
             { verificationCode: "", status: EStatus.Verified },
@@ -176,14 +177,22 @@ export class UsersService {
 
         const tokens = await this.getPairTokensUtilit(createSession, user)
 
+        // return {
+        //     user: {
+        //         name: user.username,
+        //         email: user.email,
+        //         status: user.status,
+        //         role: user.role,
+        //     },
+        //     tokens
+        // }
+        console.log(tokens.accessToken)
         return {
-            user: {
-                name: user.username,
-                email: user.email,
-                status: user.status,
-                role: user.role,
-            },
-            tokens
+            name: user.username,
+            email: user.email,
+            status: user.status,
+            role: user.role,
+            token: tokens.accessToken
         }
     };
 

@@ -49,8 +49,6 @@ export class OrdersService {
             },
         );
 
-        updatedOrder = false;
-
         if (!updatedOrder) throw new NotFoundException(`Can't change status order id:${orderId}`);
         return updatedOrder;
     };

@@ -45,6 +45,7 @@ export class UsersController {
     @Get("customer/verify/:verificationCode")
     @HttpCode(HttpStatus.OK)
     verifycationCustomer(@Param() param): any {
+        console.log(5555, param.verificationCode)
         return this.userService.verifycationCustomer(param.verificationCode)
     }
 
