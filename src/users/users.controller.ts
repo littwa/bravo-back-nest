@@ -36,16 +36,15 @@ export class UsersController {
     @Get("get")
     @UseGuards(AuthGuard('jwt'))
     getCurrentUser(@Request() req) {
+        console.log("req.user-", req.user)
         return req.user;
     }
 
     //=====================================================
 
-
     @Get("customer/verify/:verificationCode")
     @HttpCode(HttpStatus.OK)
     verifycationCustomer(@Param() param): any {
-        console.log(5555, param.verificationCode)
         return this.userService.verifycationCustomer(param.verificationCode)
     }
 

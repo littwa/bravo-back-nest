@@ -146,53 +146,20 @@ export class UsersService {
         if (!isPasswordValid) throw new BadRequestException("Password wrong");
         if (user.status !== "Verified") throw new BadRequestException("User not verified");
 
-        const userObjectId = user._id; // Check!!!
-
-        console.log(userObjectId);
+        const userObjectId = user._id;
 
         const createSession = await this.sessionModel.create({
             uid: userObjectId,
         });
 
-        // const accessToken = await this.jwtService.sign(
-        //     {
-        //         sid: createSession._id,
-        //         uid: createSession.uid,
-        //         secret: process.env.TOKEN_SECRET,
-        //         email: user.email,
-        //         role: user.role
-        //     },
-        //     { expiresIn: "2d" },
-        // );
-        // const refreshToken = await this.jwtService.sign(
-        //     {
-        //         sid: createSession._id,
-        //         uid: createSession.uid,
-        //         secret: process.env.TOKEN_SECRET,
-        //         email: user.email,
-        //         role: user.role
-        //     },
-        //     { expiresIn: "30d" },
-        // );
-
         const tokens = await this.getPairTokensUtilit(createSession, user)
 
-        // return {
-        //     user: {
-        //         name: user.username,
-        //         email: user.email,
-        //         status: user.status,
-        //         role: user.role,
-        //     },
-        //     tokens
-        // }
-        console.log(tokens.accessToken)
         return {
             name: user.username,
             email: user.email,
             status: user.status,
             role: user.role,
-            token: tokens.accessToken
+            tokens
         }
     };
 
