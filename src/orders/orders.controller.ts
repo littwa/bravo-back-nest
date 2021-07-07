@@ -31,6 +31,12 @@ export class OrdersController {
         return this.ordersService.changeOrderStatus(param.orderId, body.status);
     }
 
+    @Patch("update/:orderId")
+    @HttpCode(HttpStatus.OK)
+    updateOrder(@Param() param, @Body() body) {
+        return this.ordersService.updateOrder(param.orderId, body);
+    }
+
     @Patch("add-product/:orderId")
     @HttpCode(HttpStatus.OK)
     addProductsToOrderProdList(@Body() body, @Param() param) {

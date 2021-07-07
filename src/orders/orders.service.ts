@@ -53,7 +53,7 @@ export class OrdersService {
         return updatedOrder;
     };
 
-    async updateOrder(updatedOrderDto, orderId) {
+    async updateOrder(orderId, updatedOrderDto) {
 
         const updatedOrder = await this.orderModel.findByIdAndUpdate(
             orderId,

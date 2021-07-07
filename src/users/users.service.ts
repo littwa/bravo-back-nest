@@ -185,7 +185,6 @@ export class UsersService {
 
         let ff = await this.sessionModel.findByIdAndDelete(parsedToken.sid);
 
-
         const newSession = await this.sessionModel.create({ uid: parsedToken.uid });
 
         const newPairTokens = this.getPairTokensUtilit(newSession, user)
