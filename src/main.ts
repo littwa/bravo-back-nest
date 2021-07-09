@@ -7,7 +7,7 @@ async function bootstrap() {
 
   app.enableCors();
   app.use((req, res, next) => { console.log(req.rawHeaders); next() })
-  await app.listen(process.env.PORT);
+  await app.listen(process.env.PORT || 3000);
 
 }
 bootstrap();
