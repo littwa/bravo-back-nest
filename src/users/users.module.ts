@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { AuthGoogleController, UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 import { SharedModule } from 'src/shared/shared.module';
@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './authorization/roles.guard';
 import { OrdersModule } from 'src/orders/orders.module';
 import { Session, SessionSchema } from './session.schema';
+import { GoogleStrategy } from './strategies/google.strategy'
 
 @Module({
     imports: [
@@ -21,11 +22,11 @@ import { Session, SessionSchema } from './session.schema';
         PassportModule,
         OrdersModule
     ],
-    providers: [UsersService, LocalStrategy, JwtStrategy, {
+    providers: [GoogleStrategy, UsersService, LocalStrategy, JwtStrategy, {
         provide: APP_GUARD,
         useClass: RolesGuard,
     },],
-    controllers: [UsersController],
+    controllers: [UsersController, AuthGoogleController],
     exports: [UsersService]
 })
 export class UsersModule { }
