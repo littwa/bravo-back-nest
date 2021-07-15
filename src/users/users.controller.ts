@@ -8,90 +8,25 @@ import { ERole } from 'src/shared/enums/role.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from './authorization/roles.decorator';
 import { RolesGuard } from './authorization/roles.guard';
-
-
-// const passport = require('passport');
 import * as passport from 'passport';
-// const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-
-@Controller('google')
-export class AuthGoogleController {
-    constructor(private readonly userService: UsersService) { }
-
-    // @Get()
-    // @UseGuards(AuthGuard('google'))
-    // async googleAuth(@Req() req) {
-    //     console.log(33, req)
-    // }
-
-    // @Get('redirect')
-    // @UseGuards(AuthGuard('google'))
-    // googleAuthRedirect(@Req() req,) {
-    //     console.log(44, req.user)
-    //     return this.userService.googleLogin(req)
-    // }
-
-    // @Post("test")
-    // @UseGuards(AuthGuard('google'))
-    // async testGoogleAuth(@Req() req, @Query("code") code: string) {
-    //     console.log("req.user-", req.user)
-    //     console.log("code---", code)
-    //     return req.user
-    // }
-///----------------------------------------------------------------
-    // @Get('redirect') // :provider(google|facebook)/callback
-    // async handleOauthCallback(
-    //     @Req() req,
-    //     @Res() res,
-    //     @Next() next,
-    //     @Param('provider') provider
-    // ) {
-    //     console.log(121212122212, req.query)
-    //     console.log(3434343434, process.env.GOOGLE_CLIENT_ID)
-    //     const params = {
-    //         // session: true,
-    //         state: req.query,
-    //         callbackURL: `http://localhost:3000/google/redirect`,
-    //         clientID: process.env.GOOGLE_CLIENT_ID,
-    //         scope: ['email', 'profile'], // 
-    //         // passReqToCallback: true, // 
-    //     };
-
-    //     // We use callback here, but you can let passport do the redirect
-    //     // http://www.passportjs.org/docs/downloads/html/#custom-callback
-    //     passport.authenticate("google", params, (err, user) => {
-    //         console.log(2332323232433, user)
-    //         if (err) return next(err);
-    //         if (!user) return next(new UnauthorizedException());
-
-    //         // I generate the JWT token myself and redirect the user,
-    //         // but you can make it more smart.
-    //         // this.generateTokenAndRedirect(req, res, user);
-    //         return res.status(201).send(user);
-    //     })(req, res, next);
-    // }
-}
-//=====================================================================
 
 @Controller('users')
 export class UsersController {
 
     constructor(private readonly userService: UsersService) { }
 
-    @Get('google')
+    // Google-auth
+    @Get('google-auth')
     @UseGuards(AuthGuard('google'))
-    async googleAuth(@Req() req) {
-        console.log(33, req)
-    }
+    async googleAuth() { } // here will be redirect
 
-    @Get('google/redirect')
+    @Get('google-auth/redirect')
     @UseGuards(AuthGuard('google'))
-    googleAuthRedirect(@Req() req,) {
-        console.log(44, req.user)
-        return this.userService.googleLogin(req)
+    googleAuthRedirect(@Req() req, @Res() res) {
+        // return this.userService.googleLogin(req)
+        let f = this.userService.googleLogin(req)
+        return res.redirect('http://localhost:4200/choicse-customer')
     }
-
-    //===============================================
 
     @Post("register")
     @HttpCode(HttpStatus.CREATED)
@@ -118,8 +53,6 @@ export class UsersController {
         console.log("req.user-", req.user)
         return req.user;
     }
-
-    //=====================================================
 
     @Get("customer/verify/:verificationCode")
     @HttpCode(HttpStatus.OK)
@@ -156,8 +89,5 @@ export class UsersController {
     getRefreshToken(@Req() req) {
         return this.userService.getRefreshToken(req)
     }
-
-
-
 
 }

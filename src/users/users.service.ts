@@ -183,7 +183,7 @@ export class UsersService {
 
         if (!session || !user || user._id.toString() !== session.uid.toString()) throw new UnauthorizedException("Not authorized");
 
-        let ff = await this.sessionModel.findByIdAndDelete(parsedToken.sid);
+        let delSession = await this.sessionModel.findByIdAndDelete(parsedToken.sid);
 
         const newSession = await this.sessionModel.create({ uid: parsedToken.uid });
 
@@ -218,15 +218,46 @@ export class UsersService {
         return { accessToken, refreshToken }
     }
 
-    googleLogin(req) {
-        if (!req.user) {
-            return 'No user from google'
+    async googleLogin(req) {
+        if (!req.user) throw new UnauthorizedException("Not authorized");
+
+        let user = await this.userModel.findOne({ email: req.user.email, role: ERole.Customer, socialAuth: req.user.profile.provider });
+        let isNew: boolean = false;
+        if (!user) {
+            user = await this.userModel.create({
+                email: req.user.email,
+                socialAuth: req.user.profile.provider,
+                firstName: req.user.firstName,
+                lastName: req.user.lastName,
+                role: ERole.Customer,
+                username: req.user.email.split("@")[0],
+                avatarURL: req.user.picture,
+                status: EStatus.NotRequiredVerification,
+                customer: "60e416946e3053133891ad81" // dummy 
+            });
+
+            isNew = true;
         }
 
+        if (!user) throw new UnauthorizedException("Not authorized");
+
+        const userObjectId = user._id;
+
+        const createSession = await this.sessionModel.create({
+            uid: userObjectId,
+        });
+
+        const tokens = await this.getPairTokensUtilit(createSession, user)
+
         return {
-            message: 'User information from google',
-            user: req.user
+            name: user.username,
+            email: user.email,
+            status: user.status,
+            role: user.role,
+            tokens,
+            isNew
         }
+
     }
 
 }

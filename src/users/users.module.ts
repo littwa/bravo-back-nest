@@ -1,6 +1,6 @@
 import { HttpModule, Module } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { AuthGoogleController, UsersController } from './users.controller';
+import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './user.schema';
 import { SharedModule } from 'src/shared/shared.module';
@@ -27,7 +27,7 @@ import { GoogleStrategy } from './strategies/google.strategy'
         provide: APP_GUARD,
         useClass: RolesGuard,
     },],
-    controllers: [UsersController, AuthGoogleController],
+    controllers: [UsersController],
     exports: [UsersService]
 })
 export class UsersModule { }
