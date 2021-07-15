@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGoogleController, UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -20,7 +20,8 @@ import { GoogleStrategy } from './strategies/google.strategy'
         JwtModule.registerAsync({ useFactory: () => ({ secret: process.env.TOKEN_SECRET, signOptions: { expiresIn: '5d' } }) }),
         SharedModule,
         PassportModule,
-        OrdersModule
+        OrdersModule,
+        HttpModule
     ],
     providers: [GoogleStrategy, UsersService, LocalStrategy, JwtStrategy, {
         provide: APP_GUARD,
