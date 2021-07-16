@@ -9,6 +9,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from './authorization/roles.decorator';
 import { RolesGuard } from './authorization/roles.guard';
 import * as passport from 'passport';
+import { accessSync } from 'fs';
+import { access } from 'fs';
 
 @Controller('users')
 export class UsersController {
@@ -22,10 +24,23 @@ export class UsersController {
 
     @Get('google-auth/redirect')
     @UseGuards(AuthGuard('google'))
-    googleAuthRedirect(@Req() req, @Res() res) {
+    //@Redirect('http://localhost:4200/choicse-customer') // 'http://localhost:4200/choicse-customer'  // google-auth/return
+    async googleAuthRedirect(@Req() req, @Res() res, @Body() body) {
         // return this.userService.googleLogin(req)
-        let f = this.userService.googleLogin(req)
-        return res.redirect('http://localhost:4200/choicse-customer')
+        // console.log(res)
+        // return `<html><body><script>window.opener.postMessage('${jwt}', 'http://localhost:4200')</script></body></html>`;
+        // res.body = { qq: 2 }
+        // body = { s: 9 }
+        // res.status(201).send({ qq: 2 })
+        // console.log(1000001, req);
+        // return res.redirect('return') // google-auth/
+        // return this.userService.googleLogin(req)
+
+        const dto = await this.userService.googleLogin(req);
+        // console.log("dto--", Object.entries(dto));
+        const qString = Object.entries(dto).reduce((acc, el, i, arr) => { acc = acc + el[0].toString() + "=" + el[1].toString(); if (arr.length - 1 !== i) acc = acc + "&"; return acc }, "");
+        // console.log("qString--", qString);
+        return res.redirect('http://localhost:4200/choicse-customer?' + qString);
     }
 
     @Post("register")

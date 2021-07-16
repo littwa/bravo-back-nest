@@ -248,13 +248,15 @@ export class UsersService {
         });
 
         const tokens = await this.getPairTokensUtilit(createSession, user)
-
+        // console.log(22222)
         return {
             name: user.username,
             email: user.email,
             status: user.status,
             role: user.role,
-            tokens,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            // tokens,
             isNew
         }
 
