@@ -11,6 +11,7 @@ import { RolesGuard } from './authorization/roles.guard';
 import * as passport from 'passport';
 import { accessSync } from 'fs';
 import { access } from 'fs';
+import { baseFrontUrl } from 'src/shared/constants/url.constants';
 
 @Controller('users')
 export class UsersController {
@@ -20,27 +21,19 @@ export class UsersController {
     // Google-auth
     @Get('google-auth')
     @UseGuards(AuthGuard('google'))
-    async googleAuth() { } // here will be redirect
+    async googleAuth() { console.log(7877878) } // here will be redirect
 
     @Get('google-auth/redirect')
     @UseGuards(AuthGuard('google'))
     //@Redirect('http://localhost:4200/choicse-customer') // 'http://localhost:4200/choicse-customer'  // google-auth/return
     async googleAuthRedirect(@Req() req, @Res() res, @Body() body) {
-        // return this.userService.googleLogin(req)
-        // console.log(res)
-        // return `<html><body><script>window.opener.postMessage('${jwt}', 'http://localhost:4200')</script></body></html>`;
-        // res.body = { qq: 2 }
-        // body = { s: 9 }
-        // res.status(201).send({ qq: 2 })
-        // console.log(1000001, req);
-        // return res.redirect('return') // google-auth/
-        // return this.userService.googleLogin(req)
+
+        console.log(1000001, req.user);
 
         const dto = await this.userService.googleLogin(req);
-        // console.log("dto--", Object.entries(dto));
         const qString = Object.entries(dto).reduce((acc, el, i, arr) => { acc = acc + el[0].toString() + "=" + el[1].toString(); if (arr.length - 1 !== i) acc = acc + "&"; return acc }, "");
-        // console.log("qString--", qString);
-        return res.redirect('http://localhost:4200/choicse-customer?' + qString);
+
+        return res.redirect(`${baseFrontUrl}/choice-customer?${qString}`);
     }
 
     @Post("register")
@@ -54,6 +47,12 @@ export class UsersController {
             default:
                 return new BadRequestException("unknown role")
         }
+    }
+
+    @Post("up-date/:idCustomer")
+    @HttpCode(HttpStatus.OK)
+    updateCustomer(@Body() body, @Param() param): any {
+        this.userService.updateUserCustomer(param.idCustomer, body)
     }
 
     @Get("admin/verify/:verificationCode")
@@ -76,7 +75,7 @@ export class UsersController {
     }
 
     @Post("sign-in")
-    signUpCustomer(@Body() body) {
+    signInCustomer(@Body() body) {
         return this.userService.signIn(body);
     }
 

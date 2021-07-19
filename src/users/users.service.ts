@@ -113,6 +113,17 @@ export class UsersService {
 
     }
 
+    async updateUserCustomer(id, dto) {
+        const updatedUserCustomer = await this.userModel.findByIdAndUpdate(
+            id,
+            { ...dto },/// $set: dto
+            { new: true, useFindAndModify: false },
+        );
+
+        const { password, verificationCode, __v, ...userDtoReverse } = updatedUserCustomer.toObject();
+        return userDtoReverse;
+    }
+
     async verifycationCustomer(verificationCode) {
 
 
@@ -220,7 +231,7 @@ export class UsersService {
 
     async googleLogin(req) {
         if (!req.user) throw new UnauthorizedException("Not authorized");
-
+        console.log(22222)
         let user = await this.userModel.findOne({ email: req.user.email, role: ERole.Customer, socialAuth: req.user.profile.provider });
         let isNew: boolean = false;
         if (!user) {
@@ -248,7 +259,7 @@ export class UsersService {
         });
 
         const tokens = await this.getPairTokensUtilit(createSession, user)
-        // console.log(22222)
+
         return {
             name: user.username,
             email: user.email,

@@ -1,6 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback, Profile } from 'passport-google-oauth20';
 import { HttpService, Injectable } from '@nestjs/common';
+import { baseFrontUrl } from 'src/shared/constants/url.constants';
 
 // import { config } from 'dotenv';
 // type AuthProvider = 'google' | 'facebook';
