@@ -9,9 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from './authorization/roles.decorator';
 import { RolesGuard } from './authorization/roles.guard';
 import * as passport from 'passport';
-import { accessSync } from 'fs';
-import { access } from 'fs';
-import { baseFrontUrl } from 'src/shared/constants/url.constants';
+
 
 @Controller('users')
 export class UsersController {
@@ -33,7 +31,7 @@ export class UsersController {
         const dto = await this.userService.googleLogin(req);
         const qString = Object.entries(dto).reduce((acc, el, i, arr) => { acc = acc + el[0].toString() + "=" + el[1].toString(); if (arr.length - 1 !== i) acc = acc + "&"; return acc }, "");
 
-        return res.redirect(`${baseFrontUrl}/choice-customer?${qString}`);
+        return res.redirect(`${process.env.BASE_URL_FRONT_END}/choice-customer?${qString}`);
     }
 
     @Post("register")
@@ -52,7 +50,7 @@ export class UsersController {
     @Post("up-date/:idCustomer")
     @HttpCode(HttpStatus.OK)
     updateCustomer(@Body() body, @Param() param): any {
-        this.userService.updateUserCustomer(param.idCustomer, body)
+        return this.userService.updateUserCustomer(param.idCustomer, body)
     }
 
     @Get("admin/verify/:verificationCode")

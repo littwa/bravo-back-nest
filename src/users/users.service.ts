@@ -231,7 +231,7 @@ export class UsersService {
 
     async googleLogin(req) {
         if (!req.user) throw new UnauthorizedException("Not authorized");
-        console.log(22222)
+
         let user = await this.userModel.findOne({ email: req.user.email, role: ERole.Customer, socialAuth: req.user.profile.provider });
         let isNew: boolean = false;
         if (!user) {
@@ -268,7 +268,8 @@ export class UsersService {
             accessToken: tokens.accessToken,
             refreshToken: tokens.refreshToken,
             // tokens,
-            isNew
+            isNew,
+            userId: userObjectId
         }
 
     }

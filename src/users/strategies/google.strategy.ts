@@ -1,7 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback, Profile } from 'passport-google-oauth20';
 import { HttpService, Injectable } from '@nestjs/common';
-import { baseFrontUrl } from 'src/shared/constants/url.constants';
 
 // import { config } from 'dotenv';
 // type AuthProvider = 'google' | 'facebook';
@@ -13,7 +12,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     constructor(private httpService: HttpService) {
         super({
             clientID: process.env.GOOGLE_CLIENT_ID,
-            callbackURL: 'http://localhost:3000/users/google-auth/redirect',
+            callbackURL: `${process.env.BASE_URL_API}/users/google-auth/redirect`,
             scope: ['email', 'profile'],
             passReqToCallback: true,
         });
@@ -24,10 +23,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         // console.log(66, accessToken);
         // console.log(77, refreshToken);
         // console.log(88, profile);
-        //const jwt: string = 'placeholderJWT'
+
         // this.httpService.get('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' + accessToken).subscribe(d => console.log(888, d))
 
-        const { name, emails, photos, id } = profile
+        const { name, emails, photos, id } = profile;
         const user = {
             email: emails[0].value,
             firstName: name.givenName,

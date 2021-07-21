@@ -34,7 +34,6 @@ export class CustomersService {
 
         if (!updatedCustomer) throw new NotFoundException(`Can't updated customer`);
         return updatedCustomer
-
     };
 
     async deleteCustomer(customerId) {

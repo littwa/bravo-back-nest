@@ -1,1 +1,0 @@
-export const baseFrontUrl = 'http://localhost:4200'
