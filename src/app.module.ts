@@ -10,14 +10,18 @@ import { RolesGuard } from './users/authorization/roles.guard';
 import { CustomersModule } from './customers/customers.module';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
+import { DocumentsModule } from './documents/documents.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
-  MongooseModule.forRoot(process.env.MONGO_URL),
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true, load: [configuration] }),
+    MongooseModule.forRoot(process.env.MONGO_URL),
     UsersModule,
     CustomersModule,
     OrdersModule,
-    ProductsModule],
+    ProductsModule,
+    DocumentsModule
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
